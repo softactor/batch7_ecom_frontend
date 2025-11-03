@@ -1,0 +1,88 @@
+import { defineStore } from "pinia";
+
+import http from "../lib/http";
+
+import router from "../router";
+
+import { toast } from "vue3-toastify";
+
+
+export const useAuth = defineStore('auth', {
+
+    state: () => ({
+        email: '',
+        access_token: localStorage.getItem('access_token') || null,
+        sending: false,
+        message: '',
+        verifing: false,
+    }),
+
+    getters: {
+        isAuthenticated: (check) => check.access_token ? true : false // !!check.access_token
+    },
+
+    actions:{
+
+        async sendOtp(email){
+
+            this.sending = true 
+
+            try {
+
+                const {data}  = await http.post('login/otp/send', { email })
+
+                this.email = email
+                this.message = data?.messages
+                
+            } catch (error) {
+                
+            }
+
+        },
+
+        async verifyOtp(otp){ 
+
+            this.sending = true
+
+            try {
+
+                const { data }  = await http.post('login', { email: this.email , otp })
+                const token = data?.data?.access_token
+                this.message = data?.messages
+
+                if(token)
+                {
+                    this.access_token = token   
+                    localStorage.setItem('access_token', token)
+
+                    toast.success(this.message)
+
+                    setTimeout( () => {
+                        router.push('/dashboard/my-account')
+                    }, 2000)
+                    
+                }
+                
+                
+            } catch (error) {
+                
+            }
+
+        },
+
+
+        logout()
+        {
+            this.access_token = null 
+            localStorage.removeItem('access_token')
+            this.email = ''
+
+            toast.success('Your logout was successfull')
+            setTimeout( () => {
+                router.push('/login')
+            }, 2000)
+        }
+
+    }
+
+})
