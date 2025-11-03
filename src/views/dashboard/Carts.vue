@@ -26,12 +26,12 @@
                                 <td class="product-name" data-title="Product"><a href="#">{{ item.product.title }}</a></td>
                                 <td class="product-price" data-title="Price">{{ item.product.price }}</td>
                                 <td class="product-quantity" data-title="Quantity"><div class="quantity">
-                                <input type="button" value="-" class="minus">
+                                <input type="button" value="-" class="minus" @click="decrement(item)">
                                 <input type="text" name="quantity" :value="item.quantity" title="Qty" class="qty" size="4">
-                                <input type="button" value="+" class="plus">
+                                <input type="button" value="+" class="plus" @click="increment(item)">
                               </div></td>
                               	<td class="product-subtotal" data-title="Total">{{ item.quantity * item.price }}</td>
-                                <td class="product-remove" data-title="Remove"><a href="#"><i class="ti-close"></i></a></td>
+                                <td class="product-remove" data-title="Remove"><a href="javascript:void(0)" @click.prevent = "cart.removeCartItem(item.id)"><i class="ti-close"></i></a></td>
                             </tr>
                         </tbody>
                         <tfoot>
@@ -48,7 +48,7 @@
                                             </div>
                                     	</div>
                                         <div class="col-lg-8 col-md-6  text-start  text-md-end">
-                                            <button class="btn btn-line-fill btn-sm" type="submit">Clear Cart</button>
+                                            <button class="btn btn-line-fill btn-sm" type="button" @click="cart.clearCart()">Clear Cart</button>
                                         </div>
                                     </div>
                                 </td>
@@ -420,6 +420,17 @@ const grandTotal = computed(() => {
    return carts.value.reduce((sum, i) => sum + i.quantity * i.price, 0) 
 }) 
 
+
+const decrement = (item) => {
+    console.log('dec')
+    const check =  Number(item.quantity || 0) - 1
+
+    item.quantity = check < 1 ? 1 : check
+}
+
+const increment = (item) => {
+    item.quantity =  Number(item.quantity || 0) + 1
+}
 
 onMounted( async () => {
 

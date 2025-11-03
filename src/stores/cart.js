@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import http from "../lib/http";
 
+import { toast } from "vue3-toastify";
+
 
 export const useCart = defineStore('cart', {
 
@@ -20,6 +22,32 @@ export const useCart = defineStore('cart', {
 
                 const { data } = await http.get('/carts')
                 this.items = data?.data ?? []
+
+            }catch(error){
+
+            }
+        },
+        async removeCartItem(cartId) {
+            try{
+
+                const { data } = await http.post('/remove/cart', {
+                    cart_id:cartId
+                })
+
+                toast.success(data.messages[0])
+                this.items = this.items.filter(i => i.id != cartId)
+
+            }catch(error){
+
+            }
+        },
+
+        async clearCart() {
+            try{
+
+                const { data } = await http.get('/clear/cart')
+
+                toast.success(data.messages[0])
 
             }catch(error){
 
