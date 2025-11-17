@@ -413,7 +413,7 @@ import { useCart } from '../../stores/cart';
 
 
 const cart = useCart()
-const carts = ref([])
+const carts = computed(() => cart.items)
 
 
 const grandTotal = computed(() => {
@@ -422,7 +422,6 @@ const grandTotal = computed(() => {
 
 
 const decrement = (item) => {
-    console.log('dec')
     const check =  Number(item.quantity || 0) - 1
 
     item.quantity = check < 1 ? 1 : check
@@ -436,8 +435,9 @@ onMounted( async () => {
 
     try{
 
-        const { data } = await http.get('/carts')
-        carts.value = data?.data ?? []
+        if(cart.items.length == 0){
+            await cart.cartIemsLoad()
+        }
 
     }catch(error){
 

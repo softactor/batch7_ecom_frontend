@@ -49,6 +49,8 @@ export const useCart = defineStore('cart', {
 
                 toast.success(data.messages[0])
 
+                this.items = []
+
             }catch(error){
 
             }
