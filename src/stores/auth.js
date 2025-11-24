@@ -77,7 +77,7 @@ export const useAuth = defineStore('auth', {
                             router.push('/admin/dashboard')
 
                         }else{
-                            
+
                             router.push('/dashboard/my-account')
                         }
 
@@ -97,6 +97,7 @@ export const useAuth = defineStore('auth', {
         {
             this.access_token = null 
             localStorage.removeItem('access_token')
+            localStorage.removeItem('user')
             this.email = ''
 
             toast.success('Your logout was successfull')
