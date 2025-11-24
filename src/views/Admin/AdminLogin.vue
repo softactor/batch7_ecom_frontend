@@ -64,8 +64,6 @@
 import { ref } from 'vue';
 import { useAuth } from '../../stores/auth';
 import { toast } from "vue3-toastify";
-import http from '../../lib/http';
-import router from '../../router';
 
 
 const auth = useAuth();
@@ -74,14 +72,6 @@ const email = ref(auth.email)
 const otp = ref('')
 const step = ref(1)
 
-// const otpSend = () => {
-//   auth.sendOtp(email.value)
-// }
-
-
-// const verifyOtp = () => {
-//   auth.verifyOtp(otp.value)
-// }
 
 const handleSubmit = async () => {
 
@@ -90,68 +80,15 @@ const handleSubmit = async () => {
       if(!email.value){
         toast.error('Email is required')
       }
+      auth.sendOtp(email.value)
+      toast.success(auth.message)
 
-      try{
+      step.value = 2
 
-          const {data}  = await http.post('login/otp/send', { 
-            email:email.value
-           })
+  }else{
 
-           toast.success(data?.messages || 'OTP sent to your email')
+      auth.verifyOtp(otp.value)
 
-           step.value = 2
-
-      } catch(e){
-        toast.error('Error!'.e)
-      }
-
-      return
-
-  }
-
-  if(!otp.value){
-    toast.error('OTP is required')
-  }
-
-
-  try{
-
-    const {data}  = await http.post('login', { 
-            email:email.value,
-            otp:otp.value
-           })
-
-    const token = data?.data?.access_token
-    const user  = data?.data?.user 
-
-    if(!token || !user){
-      toast.error('Error, invalid credentials')
-    }
-   
-    localStorage.setItem('access_token', token)
-    localStorage.setItem('users', JSON.stringify(user))
-
-    toast.success(data?.messages)
-
-    const isAdmin = user.role === 'admin' || (Array.isArray(user.roles) && user.roles.includes("admin"))
-
-    if(!isAdmin)
-    {
-      toast.error('You are not admin!')
-      auth.logout();
-      return
-    }
-
-    
-    toast.success('Your Login was successfull')
-    setTimeout( () => {
-        router.push('/admin/dashboard')
-    }, 2000)
-
-
-
-  } catch(e){
-    toast.error('error')
   }
 
 }

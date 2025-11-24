@@ -1,9 +1,6 @@
 import { defineStore } from "pinia";
-
 import http from "../lib/http";
-
 import router from "../router";
-
 import { toast } from "vue3-toastify";
 
 
@@ -19,7 +16,19 @@ export const useAuth = defineStore('auth', {
     }),
 
     getters: {
-        isAuthenticated: (check) => check.access_token ? true : false // !!check.access_token
+        isAuthenticated: (check) => check.access_token ? true : false, // !!check.access_token
+        isAdmin: (check) => check.user?.role === 'admin',
+        hasPermission: (check) => {
+
+            return (permission) => {
+
+                if(!check.user || !check.user.permissions) return false;
+
+                return check.user.permissions.includes(permission);
+
+            }
+        }
+
     },
 
     actions:{
@@ -50,27 +59,28 @@ export const useAuth = defineStore('auth', {
                 const { data }  = await http.post('login', { email: this.email , otp })
                 const token = data?.data?.access_token
                 const user  = data?.data?.user 
-
-
-                console.log(user);
-                
-
-                // if(user)
-                // {
-                //     localStorage.setItem('user', token)
-                // }
-
                 this.message = data?.messages
+                console.log(user);
 
-                if(token)
+                if(token && user)
                 {
                     this.access_token = token   
                     localStorage.setItem('access_token', token)
+                    localStorage.setItem('user', JSON.stringify(user))
 
                     toast.success(this.message)
 
                     setTimeout( () => {
-                        router.push('/dashboard/my-account')
+
+                        if(user.role == 'admin'){
+
+                            router.push('/admin/dashboard')
+
+                        }else{
+                            
+                            router.push('/dashboard/my-account')
+                        }
+
                     }, 2000)
                     
                 }
@@ -83,7 +93,7 @@ export const useAuth = defineStore('auth', {
         },
 
 
-        logout()
+        logout(redirectRoute = '/login')
         {
             this.access_token = null 
             localStorage.removeItem('access_token')
@@ -91,7 +101,7 @@ export const useAuth = defineStore('auth', {
 
             toast.success('Your logout was successfull')
             setTimeout( () => {
-                router.push('/login')
+                router.push(redirectRoute)
             }, 2000)
         }
 
