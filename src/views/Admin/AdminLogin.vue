@@ -80,8 +80,10 @@ const handleSubmit = async () => {
       if(!email.value){
         toast.error('Email is required')
       }
-      auth.sendOtp(email.value)
-      toast.success(auth.message)
+      await auth.sendOtp(email.value)
+      if(auth.message){
+        toast.success(auth.message)
+      }
 
       step.value = 2
 
