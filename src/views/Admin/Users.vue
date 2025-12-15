@@ -252,10 +252,34 @@ const userDelete = async (user) => {
 }
 
 
+const initializePusher = () => {
+
+    console.log('check issue')
+
+    var pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+      cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+      forceTLS:true
+    });
+
+    console.log(pusher)
+
+    var channel = pusher.subscribe('message-channel');
+    channel.bind('message-activity', function(data) {
+      console.log(data)
+    });
+
+
+}
+
+
+
+
+
 
 onMounted(() => {
 
     loadUsers();
+    initializePusher();
 
 })
 
