@@ -125,6 +125,7 @@ import { ref, onMounted } from 'vue';
 import http from '../../lib/http';
 import { toast } from 'vue3-toastify';
 import { useAuth } from '../../stores/auth';
+import Pusher from 'pusher-js';
 
 
 const users = ref([])
@@ -265,7 +266,7 @@ const initializePusher = () => {
 
     var channel = pusher.subscribe('message-channel');
     channel.bind('message-activity', function(data) {
-      console.log(data)
+      toast.success(`User: ${data.user} Message: ${data.message} Date: ${data.date}`)
     });
 
 
